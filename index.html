@@ -65,6 +65,18 @@
         webGLRenderer.setSize(window.innerWidth, window.innerHeight);
         // webGLRenderer.shadowMapEnabled = true;
 
+        //=video texture
+        var video = document.getElementById( 'video' );
+        var videoTexture = new THREE.VideoTexture( video );
+        videoTexture.minFilter = THREE.LinearFilter;
+        videoTexture.magFilter = THREE.LinearFilter;
+        videoTexture.format = THREE.RGBFormat;
+
+        var parameters = { map: videoTexture };
+
+        var videoMeterial = new THREE.MeshLambertMaterial(parameters);
+        //=
+
         var textureLoader = new THREE.TextureLoader();
         var sphere = createEarthMesh(new THREE.SphereGeometry(10, 40, 40));
         sphere.position.x = -10;
@@ -72,6 +84,11 @@
         sphere2.position.x = 10;
         sceneColor.add(sphere);
         sceneGray.add(sphere2);
+
+        var sprite = createSpriteMesh();
+        sprite.position.x = 2;
+        sprite.position.y = -2;
+        sceneColor.add(sprite);
 
         // position and point the camera to the center of the scene
         camera.position.x = -10;
@@ -133,8 +150,8 @@
         var marsMask = new THREE.MaskPass(sceneGray, camera);
 //        marsMask.inverse = true;
 
-        var effectSepia = new THREE.ShaderPass(THREE.SepiaShader);
-        effectSepia.uniforms['amount'].value = 0.8;
+        // var effectSepia = new THREE.ShaderPass(THREE.SepiaShader);
+        // effectSepia.uniforms['amount'].value = 0.8;
 
         var effectGray = new THREE.ShaderPass(THREE.ColorifyShader);
         effectGray.uniforms['color'].value.setRGB(0.5, 0.5, 0.5);
@@ -145,21 +162,24 @@
         var composer = new THREE.EffectComposer(webGLRenderer);
         composer.renderTarget1.stencilBuffer = true;
         composer.renderTarget2.stencilBuffer = true;
+        // composer.renderTarget3.stencilBuffer = true;
 
         composer.addPass(bgPass);
         composer.addPass(renderPass);
         composer.addPass(renderPass2);
+
         composer.addPass(marsMask);
         composer.addPass(effectColorify);
         composer.addPass(clearMask);
+
         composer.addPass(earthMask);
         // composer.addPass(effectSepia);
         composer.addPass(effectGray);
         composer.addPass(clearMask);
+
         composer.addPass(effectCopy);
 
         render();
-
 
         function createMarshMesh(geom) {
             var planetTexture = textureLoader.load("../assets/textures/planets/Mars_2k-050104.png");
@@ -197,18 +217,24 @@
             // var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [planetMaterial]);
 
             //=
-            var video = document.getElementById( 'video' );
-            var texture = new THREE.VideoTexture( video );
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            texture.format = THREE.RGBFormat;
 
-            var parameters = { color: 0xffffff, map: texture };
 
-            var meterial = new THREE.MeshLambertMaterial(parameters)
-
-            var mesh = new THREE.Mesh(geom, meterial);
+            var mesh = new THREE.Mesh(geom, videoMeterial);
             //=
+
+            return mesh;
+        }
+
+        function createSpriteMesh() {
+            var spriteShape = new THREE.Shape();
+            spriteShape.moveTo(0, 0);
+            spriteShape.lineTo(1.92, 1.08);
+            spriteShape.lineTo(1.92, 1.08 * 2);
+            spriteShape.lineTo(0, 1.08);
+
+            // var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+            var mesh = new THREE.Mesh(new THREE.ShapeGeometry(spriteShape), videoMeterial);
 
             return mesh;
         }
