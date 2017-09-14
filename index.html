@@ -85,15 +85,16 @@
 
         var textureLoader = new THREE.TextureLoader();
         var sphere = createEarthMesh(new THREE.SphereGeometry(10, 40, 40));
+        console.log(new THREE.SphereGeometry(10, 40, 40));
         sphere.position.x = -10;
         var sphere2 = createMarshMesh(new THREE.SphereGeometry(5, 40, 40));
-        sphere2.position.x = 10;
+        sphere2.position.x = 20;
         sceneColor.add(sphere);
         sceneGray.add(sphere2);
 
         var sprite = createSpriteMesh();
-        sprite.position.x = 2;
-        sprite.position.y = -2;
+        sprite.position.x = 0;
+        sprite.position.y = 0;
         sceneColor.add(sprite);
 
         // position and point the camera to the center of the scene
@@ -233,15 +234,17 @@
 
         function createSpriteMesh() {
             var spriteShape = new THREE.Shape();
-            spriteShape.moveTo(0, 10);
-            spriteShape.lineTo(0, 20);
+            // spriteShape.moveTo(0, 10);
+            // spriteShape.lineTo(0, 20);
+            // spriteShape.lineTo(10, 10);
+            // spriteShape.lineTo(10, 0);
+
+            spriteShape.moveTo(0, 0);
+            spriteShape.lineTo(0, 10);
             spriteShape.lineTo(10, 10);
             spriteShape.lineTo(10, 0);
 
-            // spriteShape.moveTo(0, 0);
-            // spriteShape.lineTo(0, 10);
-            // spriteShape.lineTo(10, 10);
-            // spriteShape.lineTo(10, 0);
+
 
             // spriteShape.lineTo(1.92, 1.08);
             // spriteShape.lineTo(1.92, 1.08 * 2);
@@ -253,21 +256,58 @@
             // spriteShape.lineTo(0, 0);
 
             // var material = new THREE.MeshBasicMaterial({color: 0xff0000});
-            // var spriteGeometry = new THREE.ShapeGeometry(spriteShape, 1024);
-            var spriteGeometry = new THREE.PlaneGeometry(10,10,10);
+            var spriteGeometry = new THREE.ShapeGeometry(spriteShape);
+            var face1 = [new THREE.Vector2(0, .5), new THREE.Vector2(.3333, .5),
+                         new THREE.Vector2(.3333, 1), new THREE.Vector2(0, 1)];
+            spriteGeometry.faceVertexUvs[0] = [
+                [
+                    face1[0], face1[1], face1[3]
+                ],
+                [
+                    face1[1], face1[2], face1[3]
+                ]
+            ];
+
+            // spriteGeometry.faces[0].a = 0;
+            // spriteGeometry.faces[0].b = 1;
+            // spriteGeometry.faces[0].c = 2;
+            //
+            // spriteGeometry.faces[1].a = 2;
+            // spriteGeometry.faces[1].b = 3;
+            // spriteGeometry.faces[1].c = 0;
+
+            console.log(spriteGeometry);
+            // spriteGeometry.computeFaceNormals();
+            // var spriteGeometry = new THREE.PlaneGeometry(10,10,10);
             // var spriteGeometry = new THREE.ConeGeometry(10,10,10);
             // spriteGeometry.applyMatrix(new THREE.Matrix4().makeScale(2, 2, 2));
-            var geometry = new THREE.Geometry();
 
-            geometry.vertices.push(
-            	new THREE.Vector3( -10,  10, 0 ),
-            	new THREE.Vector3( -10, -10, 0 ),
-            	new THREE.Vector3(  10, -10, 0 )
-            );
-
-            geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-
-            geometry.computeBoundingSphere();
+            // var geometry = new THREE.Geometry();
+            // //
+            // geometry.vertices.push(
+            // 	// new THREE.Vector3( 0,  15, 0 ),
+            // 	// new THREE.Vector3( 5, 20, 0 ),
+            // 	// new THREE.Vector3(  10, 15, 0 )
+            // 	new THREE.Vector3( 0,  0, 0 ),
+            // 	new THREE.Vector3( 10, 0, 0 ),
+            // 	new THREE.Vector3( 0, 10, 0 )
+            // );
+            //
+            // geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+            //
+            // // geometry.computeBoundingBox();
+            // geometry.computeBoundingSphere();
+            // geometry.computeFaceNormals();
+            //
+            // //todo: delete "boundingSphere"
+            // geometry.faceVertexUvs[0].push([
+            //     new THREE.Vector2( 0, 0 ),
+            //     new THREE.Vector2( 1, 0 ),
+            //     new THREE.Vector2( 0, 1 )
+            // ]);
+            //
+            //
+            // console.log(geometry);
 
             var mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
 
