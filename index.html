@@ -41,12 +41,25 @@
 </div>
 
 <video id="video" autoplay loop webkit-playsinline style="display:none">
-    <source src="videos/sintel.mp4" type='videovod.2"'>
-    <source src="videos/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+    <source src="videos/video_prw_01.mp4" type='video/mp4'>
+    <!-- <source src="videos/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'> -->
 </video>
 
 <script>
     function init() {
+
+        var mesh;
+
+        var sprite_count,
+
+            meshes = [],
+            materials = [],
+
+            xgrid = 8,
+            ygrid = 5;
+
+        var face1 = [new THREE.Vector2(0, .5), new THREE.Vector2(.3333, .5),
+                     new THREE.Vector2(.3333, 1), new THREE.Vector2(0, 1)];
 
         var stats = initStats();
 
@@ -85,17 +98,18 @@
 
         var textureLoader = new THREE.TextureLoader();
         var sphere = createEarthMesh(new THREE.SphereGeometry(10, 40, 40));
-        console.log(new THREE.SphereGeometry(10, 40, 40));
+        // console.log(new THREE.SphereGeometry(10, 40, 40));
         sphere.position.x = -10;
         var sphere2 = createMarshMesh(new THREE.SphereGeometry(5, 40, 40));
         sphere2.position.x = 20;
-        sceneColor.add(sphere);
-        sceneGray.add(sphere2);
+        // sceneColor.add(sphere);
+        // sceneGray.add(sphere2);
 
-        var sprite = createSpriteMesh();
-        sprite.position.x = 0;
-        sprite.position.y = 0;
-        sceneColor.add(sprite);
+        // var sprite =
+        createSpriteMesh();
+        // sprite.position.x = 0;
+        // sprite.position.y = 0;
+        // sceneColor.add(sprite);
 
         // position and point the camera to the center of the scene
         // camera.position.x = -10;
@@ -108,21 +122,21 @@
         orbitControls.autoRotate = false;
         var clock = new THREE.Clock();
 
-        var ambi = new THREE.AmbientLight(0x181818);
-        var ambi2 = new THREE.AmbientLight(0x181818);
+        var ambi = new THREE.AmbientLight(0x181818, 10);
+        var ambi2 = new THREE.AmbientLight(0x181818, 10);
         sceneColor.add(ambi);
         sceneGray.add(ambi2);
 
-        var spotLight = new THREE.DirectionalLight(0xffffff);
-        spotLight.position.set(550, 100, 550);
-        spotLight.intensity = 0.6;
+        // var spotLight = new THREE.DirectionalLight(0xffffff);
+        // spotLight.position.set(550, 100, 550);
+        // spotLight.intensity = 0.6;
+        //
+        // var spotLight2 = new THREE.DirectionalLight(0xffffff);
+        // spotLight.position.set(550, 100, 550);
+        // spotLight.intensity = 0.6;
 
-        var spotLight2 = new THREE.DirectionalLight(0xffffff);
-        spotLight.position.set(550, 100, 550);
-        spotLight.intensity = 0.6;
-
-        sceneColor.add(spotLight);
-        sceneGray.add(spotLight2);
+        // sceneColor.add(spotLight2);
+        // sceneGray.add(spotLight);
 
         var textureGalaxy = textureLoader.load("../assets/textures/starry-deep-outer-space-galaxy.jpg");
         textureGalaxy.minFilter = THREE.LinearFilter;
@@ -157,8 +171,8 @@
         var marsMask = new THREE.MaskPass(sceneGray, camera);
 //        marsMask.inverse = true;
 
-        // var effectSepia = new THREE.ShaderPass(THREE.SepiaShader);
-        // effectSepia.uniforms['amount'].value = 0.8;
+        var effectSepia = new THREE.ShaderPass(THREE.SepiaShader);
+        effectSepia.uniforms['amount'].value = 0.8;
 
         var effectGray = new THREE.ShaderPass(THREE.ColorifyShader);
         effectGray.uniforms['color'].value.setRGB(0.5, 0.5, 0.5);
@@ -176,12 +190,15 @@
         composer.addPass(renderPass2);
 
         composer.addPass(marsMask);
-        composer.addPass(effectColorify);
+        // composer.addPass(effectColorify);
+        // composer.addPass(effectGray);
+        // composer.addPass(effectSepia);
         composer.addPass(clearMask);
 
         composer.addPass(earthMask);
-        // composer.addPass(effectSepia);
-        // composer.addPass(effectGray);
+        composer.addPass(effectSepia);
+        composer.addPass(effectGray);
+        // composer.addPass(effectColorify);
         composer.addPass(clearMask);
 
         composer.addPass(effectCopy);
@@ -233,85 +250,126 @@
         }
 
         function createSpriteMesh() {
+
+            var i, j, ux, uy, ox, oy,
+                spriteGeometry,
+                xsize, ysize;
+
+            ux = 1 / xgrid; // 1/8
+            uy = 1 / ygrid; // 1/5
+
+            xsize = 177 / xgrid; //22,125
+            ysize = 100 / ygrid; //20
+
             var spriteShape = new THREE.Shape();
             // spriteShape.moveTo(0, 10);
             // spriteShape.lineTo(0, 20);
             // spriteShape.lineTo(10, 10);
             // spriteShape.lineTo(10, 0);
 
-            spriteShape.moveTo(0, 0);
-            spriteShape.lineTo(0, 10);
-            spriteShape.lineTo(10, 10);
-            spriteShape.lineTo(10, 0);
+            sprite_count = 0;
+
+            for ( i = 0; i < xgrid; i ++ )
+            for ( j = 0; j < ygrid; j ++ ) {
+
+                ox = i; //offetx
+                oy = j; //offsety
+
+                var x = 0, y = 0;
+                var spriteShape = new THREE.Shape();
+
+                spriteShape.moveTo(0, 0);
+                spriteShape.lineTo(xsize, ysize);
+                spriteShape.lineTo(xsize, ysize * 2);
+                spriteShape.lineTo(0, ysize);
+
+                spriteGeometry = new THREE.ShapeGeometry(spriteShape);
+
+                // spriteGeometry.faceVertexUvs[0] = [
+                //     [
+                //         face1[0], face1[1], face1[3]
+                //     ],
+                //     [
+                //         face1[1], face1[2], face1[3]
+                //     ]
+                // ];
+                for (var i2 = 0; i2 < 2; i2++)
+                for (var j2 = 0; j2 < 3; j2++) {
+                    spriteGeometry.faceVertexUvs[0][i2][j2].x /= 19;
+                    spriteGeometry.faceVertexUvs[0][i2][j2].y /= 19;
+                }
+                // spriteGeometry.faceVertexUvs[0][0][0].x /= 100;
+                // spriteGeometry.faceVertexUvs[0][0][0].y /= 100;
+                // spriteGeometry.faceVertexUvs[0][0][1].x /= 100;
+                // spriteGeometry.faceVertexUvs[0][0][1].y /= 100;
+                // spriteGeometry.faceVertexUvs[0][0][2].x /= 100;
+                // spriteGeometry.faceVertexUvs[0][0][2].y /= 100;
+                // spriteGeometry.faceVertexUvs[0][0][0].x /= 100;
 
 
+                change_uvs( spriteGeometry, ux, uy, ox, oy );
 
-            // spriteShape.lineTo(1.92, 1.08);
-            // spriteShape.lineTo(1.92, 1.08 * 2);
-            // spriteShape.lineTo(0, 1.08);
-            // spriteShape.lineTo(12.5, 7.03);
-            // spriteShape.lineTo(12.5, 7.03 * 2);
-            // spriteShape.lineTo(0, 7.03);
+                mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
 
-            // spriteShape.lineTo(0, 0);
+                mesh.position.x =   ( i - xgrid/2 ) * xsize;
+                mesh.position.y =   ( j - ygrid/2 ) * ysize;
+                mesh.position.z = 0;
+
+                if ( Math.floor(Math.random() * 2) == 1 ) {
+                // if (i < 4) {
+                    sceneColor.add(mesh);
+                } else {
+                    sceneGray.add(mesh);
+                }
+
+                sprite_count += 1;
+                // console.log(spriteGeometry);
+            }
+
+            // console.log(sprite_count);
+
 
             // var material = new THREE.MeshBasicMaterial({color: 0xff0000});
-            var spriteGeometry = new THREE.ShapeGeometry(spriteShape);
-            var face1 = [new THREE.Vector2(0, .5), new THREE.Vector2(.3333, .5),
-                         new THREE.Vector2(.3333, 1), new THREE.Vector2(0, 1)];
-            spriteGeometry.faceVertexUvs[0] = [
-                [
-                    face1[0], face1[1], face1[3]
-                ],
-                [
-                    face1[1], face1[2], face1[3]
-                ]
-            ];
+            // var face1 = [new THREE.Vector2(0, .5), new THREE.Vector2(.3333, .5),
+            //              new THREE.Vector2(.3333, 1), new THREE.Vector2(0, 1)];
+            // spriteGeometry.faceVertexUvs[0] = [
+            //     [
+            //         face1[0], face1[1], face1[3]
+            //     ],
+            //     [
+            //         face1[1], face1[2], face1[3]
+            //     ]
+            // ];
 
-            // spriteGeometry.faces[0].a = 0;
-            // spriteGeometry.faces[0].b = 1;
-            // spriteGeometry.faces[0].c = 2;
-            //
-            // spriteGeometry.faces[1].a = 2;
-            // spriteGeometry.faces[1].b = 3;
-            // spriteGeometry.faces[1].c = 0;
+            // console.log(spriteGeometry);
 
-            console.log(spriteGeometry);
-            // spriteGeometry.computeFaceNormals();
-            // var spriteGeometry = new THREE.PlaneGeometry(10,10,10);
-            // var spriteGeometry = new THREE.ConeGeometry(10,10,10);
-            // spriteGeometry.applyMatrix(new THREE.Matrix4().makeScale(2, 2, 2));
-
-            // var geometry = new THREE.Geometry();
-            // //
-            // geometry.vertices.push(
-            // 	// new THREE.Vector3( 0,  15, 0 ),
-            // 	// new THREE.Vector3( 5, 20, 0 ),
-            // 	// new THREE.Vector3(  10, 15, 0 )
-            // 	new THREE.Vector3( 0,  0, 0 ),
-            // 	new THREE.Vector3( 10, 0, 0 ),
-            // 	new THREE.Vector3( 0, 10, 0 )
-            // );
-            //
-            // geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-            //
-            // // geometry.computeBoundingBox();
-            // geometry.computeBoundingSphere();
-            // geometry.computeFaceNormals();
-            //
-            // //todo: delete "boundingSphere"
-            // geometry.faceVertexUvs[0].push([
-            //     new THREE.Vector2( 0, 0 ),
-            //     new THREE.Vector2( 1, 0 ),
-            //     new THREE.Vector2( 0, 1 )
-            // ]);
-            //
-            //
-            // console.log(geometry);
-
-            var mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
+            // var mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
 
             return mesh;
+        }
+
+        console.log(sceneColor);
+        console.log(sceneGray);
+
+        function change_uvs( geometry, unitx, unity, offsetx, offsety ) {
+
+            var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+
+            for ( var i = 0; i < faceVertexUvs.length; i ++ ) {
+
+                var uvs = faceVertexUvs[ i ];
+
+                for ( var j = 0; j < uvs.length; j ++ ) {
+
+                    var uv = uvs[ j ];
+
+                    uv.x = ( uv.x + offsetx ) * unitx;
+                    uv.y = ( uv.y + offsety ) * unity;
+
+                }
+
+            }
+
         }
 
         function render() {
@@ -356,6 +414,14 @@
         }
 
         window.addEventListener('resize', onResize, false);
+
+        document.getElementById('WebGL-output').addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
 
     }
     window.onload = init;
