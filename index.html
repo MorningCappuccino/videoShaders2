@@ -462,25 +462,35 @@
         var randSpriteMaterial;
 
         function fillSprites() {
-            var randSpr = randSprite();
-            var sprite = (randSpr != currHightlightSprite) ? randSpr : randSprite();
-            var scene = sprite.parent;
-            randSpriteMaterial = sprite.material;
-            randSprites[0] = sprite;
-            sprite.material = new THREE.MeshBasicMaterial({color: 0xff0000});
-            //to sceneColor
-            if (scene != 'color') {
-                scene.remove(sprite);
-                sceneColor.add(sprite);
+            var randSpr;
+            var sprite, scene;
+            var colors = [0xff0000, 0x00ff00, 0x0000ff];
+            randSpriteMaterial = sprites[0].material;
+            for (var i = 0; i < 3; i++) {
+                randSpr = randSprite();
+                sprite = (randSpr != currHightlightSprite) ? randSpr : randSprite();
+
+                randSprites[i] = sprite;
+                sprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+
+                scene = sprite.parent;
+                //to sceneColor
+                if (scene != 'color') {
+                    scene.remove(sprite);
+                    sceneColor.add(sprite);
+                }
             }
+
         }
 
         function unfillSprite() {
-            var sprite = randSprites[0];
-            sprite.material = randSpriteMaterial;
-            sprite.parent.remove(sprite);
-            sceneGray.add(sprite);
-
+            var sprite;
+            for (var i = 0; i < 3; i++) {
+                sprite = randSprites[i];
+                sprite.material = randSpriteMaterial;
+                sprite.parent.remove(sprite);
+                sceneGray.add(sprite);
+            }
         }
 
         document.getElementById('WebGL-output').addEventListener( 'mousemove', onDocumentMouseMove, false );
