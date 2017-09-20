@@ -59,7 +59,7 @@
             materials = [],
 
             xgrid = 8,
-            ygrid = 5;
+            ygrid = 6;
 
         var stats = initStats();
 
@@ -190,8 +190,10 @@
             ux = 1 / xgrid; // 1/8
             uy = 1 / ygrid; // 1/5
 
-            xsize = 177 / xgrid; //22,125
-            ysize = 100 / ygrid; //20
+            // xsize = 177 / xgrid; //22,125
+            // ysize = 100 / ygrid; //20
+            xsize = 192 / xgrid; //24
+            ysize = 108 / ygrid; //18
 
             var spriteShape = new THREE.Shape();
 
@@ -322,6 +324,7 @@
 			mouse = new THREE.Vector2();
         var currHightlightSprite, prevHightlightSprite, isFirst = true,
             currTexture, prevTexture;
+        var currSibling, prevSibling;
 
         function onDocumentMouseMove( event ) {
 
@@ -342,20 +345,34 @@
                     var obj = intersects[ 0 ].object;
 
                     saveCurrPrevSprite(obj);
-
                     // console.log(obj);
+
+                    // console.log(sibling);
+
                     var currScene = obj.parent;
                     if (currScene != 'color') {
+                        if (prevHightlightSprite) {
+                            sceneColor.remove(prevHightlightSprite);
+                            // prevHightlightSprite.material = currTexture;
+                            sceneGray.add(prevHightlightSprite);
+
+                            prevSibling.forEach(function(sprite, index) {
+    					        sceneColor.remove(sprite);
+    					        sceneGray.add(sprite);
+                            });
+                        }
+
 					    currScene.remove(currHightlightSprite);
 					    sceneColor.add(currHightlightSprite);
 
-                        currHightlightSprite.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                        currSibling.forEach(function(sprite, index) {
+					        currScene.remove(sprite);
+					        sceneColor.add(sprite);
+                        });
 
-                        sceneColor.remove(prevHightlightSprite);
-                        if (prevHightlightSprite) {
-                            prevHightlightSprite.material = currTexture;
-                            sceneGray.add(prevHightlightSprite);
-                        }
+                        // currHightlightSprite.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+
                     }
 
 			}
@@ -374,15 +391,58 @@
                 if (obj != currHightlightSprite) {
                     // console.log('new sprite');
                     prevHightlightSprite = currHightlightSprite;
-                    prevTexture = currHightlightSprite.material;
+                    // prevTexture = currHightlightSprite.material;
                     currHightlightSprite = obj;
-                    currTexture = obj.material;
+                    // currTexture = obj.material;
+
+                    //save prevSibling
+                    prevSibling = currSibling;
+                    currSibling = getSiblingSprite(obj);
                 }
             } else {
                 currHightlightSprite = obj;
-                currTexture = obj.material;
+                // currTexture = obj.material;
+
+                //save currSibling
+                currSibling = getSiblingSprite(obj);
                 isFirst = false;
             }
+        }
+
+        function getSiblingSprite(obj) {
+            var currIndex, siblingIndex = [], siblingMesh = [];
+
+            sprites.forEach(function(sprite, index) {
+                if (sprite.uuid == obj.uuid) {
+                    currIndex = index;
+                }
+            });
+
+            if (currIndex > 0 ) {
+                siblingIndex.push(currIndex - 1);
+            }
+
+            if (currIndex < sprites.length - 1) {
+                siblingIndex.push(currIndex + 1);
+            }
+
+            siblingIndex.push(currIndex + 6);
+            siblingIndex.push(currIndex - 6);
+            siblingIndex.push(currIndex + 7);
+            siblingIndex.push(currIndex - 7);
+            siblingIndex.push(currIndex + 8);
+            siblingIndex.push(currIndex - 8);
+
+
+            sprites.forEach(function(sprite, index) {
+                siblingIndex.forEach(function(si, i) {
+                    if (index == si) {
+                        siblingMesh.push(sprite);
+                    }
+                });
+            });
+
+            return siblingMesh;
         }
 
         document.getElementById('WebGL-output').addEventListener( 'mousemove', onDocumentMouseMove, false );
