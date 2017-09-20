@@ -418,20 +418,15 @@
                 }
             });
 
-            if (currIndex > 0 ) {
-                siblingIndex.push(currIndex - 1);
-            }
+            if (randZeroOne()) siblingIndex.push(currIndex - 1);
+            if (randZeroOne()) siblingIndex.push(currIndex + 1);
 
-            if (currIndex < sprites.length - 1) {
-                siblingIndex.push(currIndex + 1);
-            }
-
-            siblingIndex.push(currIndex + 6);
-            siblingIndex.push(currIndex - 6);
-            siblingIndex.push(currIndex + 7);
-            siblingIndex.push(currIndex - 7);
-            siblingIndex.push(currIndex + 8);
-            siblingIndex.push(currIndex - 8);
+            if (randZeroOne()) siblingIndex.push(currIndex + 6);
+            if (randZeroOne()) siblingIndex.push(currIndex - 6);
+            if (randZeroOne()) siblingIndex.push(currIndex + 7);
+            if (randZeroOne()) siblingIndex.push(currIndex - 7);
+            if (randZeroOne()) siblingIndex.push(currIndex + 8);
+            if (randZeroOne()) siblingIndex.push(currIndex - 8);
 
 
             sprites.forEach(function(sprite, index) {
@@ -443,6 +438,10 @@
             });
 
             return siblingMesh;
+        }
+
+        function randZeroOne() {
+            return Math.floor(Math.random() * 2);
         }
 
         document.getElementById('WebGL-output').addEventListener( 'mousemove', onDocumentMouseMove, false );
