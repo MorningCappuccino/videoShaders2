@@ -237,6 +237,7 @@
                 // }
 
                 sprites.push(mesh);
+                mesh.myid = sprite_count;
 
                 sprite_count += 1;
                 // console.log(spriteGeometry);
@@ -345,7 +346,7 @@
                     var obj = intersects[ 0 ].object;
 
                     saveCurrPrevSprite(obj);
-                    // console.log(obj);
+                    // console.log(obj.myid);
 
                     // console.log(sibling);
 
@@ -460,18 +461,41 @@
 
         var randSprites = [];
         var randSpriteMaterial;
+        var disableWhiteSprite = [13, 14, 15, 19, 20, 21, 25, 26, 27, 31, 32, 33];
+        var enableWhiteSprite = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18,
+                                22, 23, 24,  28, 29, 30, 34, 35, 36, 37, 38, 39, 40,
+                                41, 42, 43, 44, 45, 46, 47];
 
         function fillSprites() {
             var randSpr;
             var sprite, scene;
-            var colors = [0xff0000, 0x00ff00, 0x0000ff];
+            var colors = [0xdd0934, 0x2c2664, 0xffffff];
             randSpriteMaterial = sprites[0].material;
             for (var i = 0; i < 3; i++) {
                 randSpr = randSprite();
                 sprite = (randSpr != currHightlightSprite) ? randSpr : randSprite();
 
-                randSprites[i] = sprite;
-                sprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                if (i != 2) {
+                    randSprites[i] = sprite;
+                    sprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                } else {
+                    //white color
+                    var newSprite;
+                    for (var j = 0; j < disableWhiteSprite.length; j++) {
+                        if (sprite.myid == disableWhiteSprite[j]) {
+                            var rand = Math.floor(Math.random() * enableWhiteSprite.length);
+                            newSprite = sprites[enableWhiteSprite[rand]];
+                            break;
+                        }
+                    }
+                    if (newSprite) {
+                        randSprites[i] = newSprite;
+                        newSprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                    } else {
+                        randSprites[i] = sprite;
+                        sprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                    }
+                }
 
                 scene = sprite.parent;
                 //to sceneColor
