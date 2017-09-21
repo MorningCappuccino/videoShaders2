@@ -49,6 +49,10 @@
 </video>
 
 <script>
+var sceneColor = new THREE.Scene();
+    sceneColor.name = 'color';
+var sceneGray = new THREE.Scene();
+    sceneGray.name = 'gray';
     function init() {
 
         var mesh, sprites = [];
@@ -63,10 +67,7 @@
 
         var stats = initStats();
 
-        var sceneColor = new THREE.Scene();
-            sceneColor.name = 'color';
-        var sceneGray = new THREE.Scene();
-            sceneGray.name = 'gray';
+
         var sceneBG = new THREE.Scene();
 
         var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 3000);
@@ -379,22 +380,25 @@
                             prevSibling.forEach(function(sprite, index) {
     					        sceneColor.remove(sprite);
     					        sceneGray.add(sprite);
+                                //check for prevSprite != currColorSprite
+                                randSprites.forEach(function(colorSprite, i) {
+                                    if (colorSprite == sprite) {
+    					                sceneGray.remove(sprite);
+    					                sceneColor.add(sprite);
+                                    }
+                                });
                             });
                         }
 
 					    currScene.remove(currHightlightSprite);
 					    sceneColor.add(currHightlightSprite);
 
-
                         currSibling.forEach(function(sprite, index) {
 					        currScene.remove(sprite);
 					        sceneColor.add(sprite);
                         });
 
-                        // currHightlightSprite.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-
                     }
-
 
 			}
 
