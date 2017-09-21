@@ -385,6 +385,7 @@
 					    currScene.remove(currHightlightSprite);
 					    sceneColor.add(currHightlightSprite);
 
+
                         currSibling.forEach(function(sprite, index) {
 					        currScene.remove(sprite);
 					        sceneColor.add(sprite);
@@ -508,7 +509,7 @@
                         }
                     }
                     if (newSprite) {
-                        randSprites[i] = newSprite;
+                        randSprites[i] = sprite = newSprite;
                         newSprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
                     } else {
                         randSprites[i] = sprite;
