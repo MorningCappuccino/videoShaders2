@@ -59,7 +59,7 @@
             materials = [],
 
             xgrid = 8,
-            ygrid = 6;
+            ygrid = 5;
 
         var stats = initStats();
 
@@ -69,7 +69,7 @@
             sceneGray.name = 'gray';
         var sceneBG = new THREE.Scene();
 
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 3000);
         var cameraBG = new THREE.OrthographicCamera(-window.innerWidth, window.innerWidth, window.innerHeight, -window.innerHeight, -10000, 10000);
         cameraBG.position.z = 50;
 
@@ -207,10 +207,10 @@
             var c = 0;
 
             for ( i = 0; i < xgrid; i ++ )
-            for ( j = 0; j < ygrid; j ++ ) {
+            for ( j = 0; j <= ygrid; j ++ ) {
 
                 ox = i; //offetx
-                oy = j; //offsety
+                oy = j-1; //offsety
 
                 var x = 0, y = 0;
                 var spriteShape = new THREE.Shape();
@@ -244,8 +244,8 @@
                 mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
 
                 mesh.position.x =  ( i - xgrid/2 ) * xsize;
-                mesh.position.y =  ( j - ygrid/2 ) * ysize;
-                // mesh.position.y =  ( j - ygrid/2 ) * ysize - (ysize/2);
+                mesh.position.y =  ( j-1 - ygrid/2 ) * ysize;
+                // mesh.position.y =  ( j - ygrid/2 ) * ysize - ysize;
                 mesh.position.z = 0;
 
                 // if ( Math.floor(Math.random() * 2) == 1 ) {
