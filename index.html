@@ -69,7 +69,7 @@
             sceneGray.name = 'gray';
         var sceneBG = new THREE.Scene();
 
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
         var cameraBG = new THREE.OrthographicCamera(-window.innerWidth, window.innerWidth, window.innerHeight, -window.innerHeight, -10000, 10000);
         cameraBG.position.z = 50;
 
@@ -94,7 +94,7 @@
         var videoMeterial = new THREE.MeshBasicMaterial(parameters);
         //====================================================
 
-        var axisHelper = new THREE.AxisHelper(100);
+        var axisHelper = new THREE.AxisHelper(1080);
         sceneColor.add(axisHelper);
 
         var textureLoader = new THREE.TextureLoader();
@@ -104,7 +104,7 @@
         // position and point the camera to the center of the scene
         // camera.position.x = -10;
         // camera.position.y = 15;
-        camera.position.z = 100;
+        camera.position.z = 1300;
 
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -181,6 +181,8 @@
 
         render();
 
+        // console.log(sceneBG);
+
         function createSpriteMesh() {
 
             var i, j, ux, uy, ox, oy,
@@ -192,8 +194,12 @@
 
             // xsize = 177 / xgrid; //22,125
             // ysize = 100 / ygrid; //20
-            xsize = 192 / xgrid; //24
-            ysize = 108 / ygrid; //18
+            // xsize = 160 / xgrid; //20
+            // ysize = 90 / ygrid; //15
+            xsize = window.innerWidth / xgrid; //240
+            ysize = window.innerHeight / ygrid; //180
+            // xsize = 230.4 / xgrid; //24
+            // ysize = 129.6 / ygrid; //18
 
             var spriteShape = new THREE.Shape();
 
@@ -208,25 +214,66 @@
                 var x = 0, y = 0;
                 var spriteShape = new THREE.Shape();
 
-                spriteShape.moveTo(0, 0);
-                spriteShape.lineTo(xsize, ysize);
-                spriteShape.lineTo(xsize, ysize * 2);
-                spriteShape.lineTo(0, ysize);
+                // console.log(i % 2 == 0);
+
+                if (i % 2 == 0) {
+
+                    spriteShape.moveTo(0, 0);
+                    spriteShape.lineTo(0, ysize);
+                    spriteShape.lineTo(-xsize, ysize * 2);
+                    spriteShape.lineTo(-xsize, ysize);
+
+                } else {
+
+                    spriteShape.moveTo(0, 0);
+                    spriteShape.lineTo(xsize, ysize);
+                    spriteShape.lineTo(xsize, ysize * 2);
+                    spriteShape.lineTo(0, ysize);
+
+                }
+
 
                 spriteGeometry = new THREE.ShapeGeometry(spriteShape);
 
-                for (var i2 = 0; i2 < 2; i2++)
-                for (var j2 = 0; j2 < 3; j2++) {
-                    spriteGeometry.faceVertexUvs[0][i2][j2].x /= 19;
-                    spriteGeometry.faceVertexUvs[0][i2][j2].y /= 19;
-                }
+                // if (i % 2 == 0) {
+
+                    for (var i2 = 0; i2 < 2; i2++)
+                    for (var j2 = 0; j2 < 3; j2++) {
+                        spriteGeometry.faceVertexUvs[0][i2][j2].x /= 230;
+                        spriteGeometry.faceVertexUvs[0][i2][j2].y /= 200;
+                    }
+
+                // } else {
+                //
+                //     for (var i2 = 0; i2 < 2; i2++)
+                //     for (var j2 = 0; j2 < 3; j2++) {
+                //         spriteGeometry.faceVertexUvs[0][i2][j2].x /= 230;
+                //         spriteGeometry.faceVertexUvs[0][i2][j2].y /= 200;
+                //     }
+                //
+                // }
+
 
                 change_uvs( spriteGeometry, ux, uy, ox, oy );
 
                 mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
 
-                mesh.position.x =   ( i - xgrid/2 ) * xsize;
-                mesh.position.y =   ( j - ygrid/2 ) * ysize;
+                if (i % 2 != 0) {
+                    //odd
+                    mesh.position.x =  (( i - xgrid/2 ) * xsize);
+                    // console.log(mesh.position.x );
+                    mesh.position.y =  ( j - ygrid/2 ) * ysize;
+                    // mesh.position.y =  ( j - ygrid/2 ) * ysize - (ysize/2);
+
+                } else {
+                    //even
+                    mesh.position.x =   ((i - xgrid/2 ) * xsize) + xsize;
+                    console.log(mesh.position.x );
+                    mesh.position.y =   ( j - ygrid/2 ) * ysize;
+                    // mesh.position.y =  ( j - ygrid/2 ) * ysize - (ysize/2);
+
+                }
+
                 mesh.position.z = 0;
 
                 // if ( Math.floor(Math.random() * 2) == 1 ) {
@@ -346,7 +393,7 @@
                     var obj = intersects[ 0 ].object;
 
                     saveCurrPrevSprite(obj);
-                    // console.log(obj.myid);
+                    console.log(obj.myid);
 
                     // console.log(sibling);
 
@@ -431,12 +478,12 @@
             siblingIndex.push(currIndex - 1);
             siblingIndex.push(currIndex + 1);
 
+            if (randZeroOne()) siblingIndex.push(currIndex + 5);
+            if (randZeroOne()) siblingIndex.push(currIndex - 5);
             if (randZeroOne()) siblingIndex.push(currIndex + 6);
             if (randZeroOne()) siblingIndex.push(currIndex - 6);
             if (randZeroOne()) siblingIndex.push(currIndex + 7);
             if (randZeroOne()) siblingIndex.push(currIndex - 7);
-            if (randZeroOne()) siblingIndex.push(currIndex + 8);
-            if (randZeroOne()) siblingIndex.push(currIndex - 8);
 
 
             sprites.forEach(function(sprite, index) {
