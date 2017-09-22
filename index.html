@@ -69,6 +69,8 @@
         var sceneGray = new THREE.Scene();
             sceneGray.name = 'gray';
         var sceneBG = new THREE.Scene();
+        var sceneDeepGray = new THREE.Scene();
+            sceneGray.name = 'deepGray';
 
         var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 3000);
         var cameraBG = new THREE.OrthographicCamera(-window.innerWidth, window.innerWidth, window.innerHeight, -window.innerHeight, -10000, 10000);
@@ -95,8 +97,8 @@
         var videoMeterial = new THREE.MeshBasicMaterial(parameters);
         //====================================================
 
-        var axisHelper = new THREE.AxisHelper(1080);
-        sceneColor.add(axisHelper);
+        // var axisHelper = new THREE.AxisHelper(1080);
+        // sceneColor.add(axisHelper);
 
         var textureLoader = new THREE.TextureLoader();
 
@@ -108,7 +110,6 @@
         // camera.position.z = 1300; //for width 1920
         // camera.position.z = window.innerWidth / 1.477;
         camera.position.z = window.innerHeight / 0.831;
-        console.log('cam z: ' + window.innerHeight / 0.831);
 
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -118,8 +119,10 @@
 
         var ambi = new THREE.AmbientLight(0x181818, 10);
         var ambi2 = new THREE.AmbientLight(0x181818, 10);
+        var ambi3 = new THREE.AmbientLight(0x181818, 10);
         sceneColor.add(ambi);
         sceneGray.add(ambi2);
+        sceneDeepGray.add(ambi3);
 
         var textureGalaxy = textureLoader.load("../assets/textures/starry-deep-outer-space-galaxy.jpg");
         textureGalaxy.minFilter = THREE.LinearFilter;
@@ -141,6 +144,8 @@
         renderPass.clear = false;
         var renderPass2 = new THREE.RenderPass(sceneGray, camera);
         renderPass2.clear = false;
+        var renderPass3 = new THREE.RenderPass(sceneDeepGray, camera);
+        renderPass2.clear = false;
 
         var effectCopy = new THREE.ShaderPass(THREE.CopyShader);
         effectCopy.renderToScreen = true;
@@ -148,17 +153,22 @@
 
         var clearMask = new THREE.ClearMaskPass();
         // earth mask
-        var earthMask = new THREE.MaskPass(sceneColor, camera);
+        var colorMask = new THREE.MaskPass(sceneColor, camera);
 //        earthMask.inverse = true;
         // mars mask
-        var marsMask = new THREE.MaskPass(sceneGray, camera);
+        var grayMask = new THREE.MaskPass(sceneGray, camera);
 //        marsMask.inverse = true;
+        var deepGrayMask = new THREE.MaskPass(sceneDeepGray, camera);
 
         var effectSepia = new THREE.ShaderPass(THREE.SepiaShader);
         effectSepia.uniforms['amount'].value = 0.8;
 
         var effectGray = new THREE.ShaderPass(THREE.ColorifyShader);
         effectGray.uniforms['color'].value.setRGB(0.5, 0.5, 0.5);
+
+        var effectDeepGray = new THREE.ShaderPass(THREE.ColorifyShader);
+        // effectDeepGray.uniforms['color'].value.setRGB(0.2, 0.2, 0.2);
+        effectDeepGray.uniforms['color'].value.setRGB(1, 0.2, 0.2);
 
         var effectColorify = new THREE.ShaderPass(THREE.ColorifyShader);
         effectColorify.uniforms['color'].value.setRGB(0.5, 0.5, 1);
@@ -168,17 +178,29 @@
         composer.renderTarget2.stencilBuffer = true;
         // composer.renderTarget3.stencilBuffer = true;
 
-        composer.addPass(bgPass);
-        composer.addPass(renderPass);
-        composer.addPass(renderPass2);
+        // composer.addPass(bgPass);
+        //not working ---->>> why???
+        // composer.addPass(renderPass); //color
+        // composer.addPass(renderPass2); //gray
+        // composer.addPass(renderPass3); //deepGray
 
-        composer.addPass(marsMask);
+        //working
+        composer.addPass(renderPass3); //deepGray
+        composer.addPass(renderPass); //color
+        composer.addPass(renderPass2); //gray
+
+
+        composer.addPass(grayMask);
         // composer.addPass(effectColorify);
         composer.addPass(effectGray);
         composer.addPass(clearMask);
 
-        composer.addPass(earthMask);
+        // composer.addPass(colorMask);
         // composer.addPass(effectSepia);
+        // composer.addPass(clearMask);
+
+        composer.addPass(deepGrayMask);
+        composer.addPass(effectDeepGray);
         composer.addPass(clearMask);
 
         composer.addPass(effectCopy);
@@ -244,11 +266,11 @@
                 mesh.position.z = 0;
 
                 // if ( Math.floor(Math.random() * 2) == 1 ) {
-                // if (i < 4) {
-                    // sceneColor.add(mesh);
-                // } else {
+                if (i < 4) {
+                    sceneDeepGray.add(mesh);
+                } else {
                     sceneGray.add(mesh);
-                // }
+                }
 
                 sprites.push(mesh);
                 mesh.myid = sprite_count;
@@ -267,7 +289,7 @@
             for (var j2 = 0; j2 < 3; j2++) {
                 // spriteGeometry.faceVertexUvs[0][i2][j2].x /= 240; //for width 1920
                 // spriteGeometry.faceVertexUvs[0][i2][j2].y /= 216; //for width 1920
-                spriteGeometry.faceVertexUvs[0][i2][j2].x /= w / 8.2;
+                spriteGeometry.faceVertexUvs[0][i2][j2].x /= w / 8.1;
                 spriteGeometry.faceVertexUvs[0][i2][j2].y /= h / 5.1;
             }
         }
@@ -375,7 +397,7 @@
                     var obj = intersects[ 0 ].object;
 
                     saveCurrPrevSprite(obj);
-                    console.log(obj);
+                    // console.log(obj);
 
                     // console.log(sibling);
 
