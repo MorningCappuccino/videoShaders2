@@ -13,7 +13,7 @@
     <script type="text/javascript" src="js/shaders/ColorifyShader.js"></script>
 
     <script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-    <script type="text/javascript" src="js/shaders/ConvolutionShader.js"></script>
+    <!-- <script type="text/javascript" src="js/shaders/ConvolutionShader.js"></script> -->
 
 
     <script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="js/postprocessing/TexturePass.js"></script>
 
     <script type="text/javascript" src="js/renderers/Projector.js"></script>
-    <script type="text/javascript" src="js/renderers/CanvasRenderer.js"></script>
+    <!-- <script type="text/javascript" src="js/renderers/CanvasRenderer.js"></script> -->
 
     <style>
         body {
@@ -43,7 +43,7 @@
 <div id="WebGL-output">
 </div>
 
-<video id="video" autoplay loop webkit-playsinline style="display:none">
+<video id="video" autoplay loop style="display:none">
     <source src="videos/video_prw_01.mp4" type='video/mp4'>
     <!-- <source src="videos/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'> -->
 </video>
@@ -62,7 +62,7 @@
             xgrid = 8,
             ygrid = 5;
 
-        var stats = initStats();
+        // var stats = initStats();
 
         var sceneColor = new THREE.Scene();
             sceneColor.name = 'color';
@@ -124,16 +124,16 @@
         sceneGray.add(ambi2);
         sceneDeepGray.add(ambi3);
 
-        var textureGalaxy = textureLoader.load("../assets/textures/starry-deep-outer-space-galaxy.jpg");
-        textureGalaxy.minFilter = THREE.LinearFilter;
-        var materialColor = new THREE.MeshBasicMaterial({
-            map: textureGalaxy,
-            depthTest: false
-        });
-        var bgPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), materialColor);
-        bgPlane.position.z = -100;
-        bgPlane.scale.set(window.innerWidth * 2, window.innerHeight * 2, 1);
-        sceneBG.add(bgPlane);
+        // var textureGalaxy = textureLoader.load("../assets/textures/starry-deep-outer-space-galaxy.jpg");
+        // textureGalaxy.minFilter = THREE.LinearFilter;
+        // var materialColor = new THREE.MeshBasicMaterial({
+        //     map: textureGalaxy,
+        //     depthTest: false
+        // });
+        // var bgPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), materialColor);
+        // bgPlane.position.z = -100;
+        // bgPlane.scale.set(window.innerWidth * 2, window.innerHeight * 2, 1);
+        // sceneBG.add(bgPlane);
 
         // add the output of the renderer to the html element
         document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
@@ -313,12 +313,12 @@
 
             webGLRenderer.autoClear = false;
 
-            stats.update();
+            // stats.update();
 
 
             //sphere.rotation.y=step+=0.01;
             var delta = clock.getDelta();
-            orbitControls.update(delta);
+            // orbitControls.update(delta);
 
             // render using requestAnimationFrame
             // requestAnimationFrame(render);
@@ -327,20 +327,20 @@
         }
         setInterval(render, 1000/25);
 
-        function initStats() {
-
-            var stats = new Stats();
-            stats.setMode(0); // 0: fps, 1: ms
-
-            // Align top-left
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-
-            document.getElementById("Stats-output").appendChild(stats.domElement);
-
-            return stats;
-        }
+        // function initStats() {
+        //
+        //     var stats = new Stats();
+        //     stats.setMode(0); // 0: fps, 1: ms
+        //
+        //     // Align top-left
+        //     stats.domElement.style.position = 'absolute';
+        //     stats.domElement.style.left = '0px';
+        //     stats.domElement.style.top = '0px';
+        //
+        //     document.getElementById("Stats-output").appendChild(stats.domElement);
+        //
+        //     return stats;
+        // }
 
         function onResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -352,13 +352,13 @@
 
         window.addEventListener('resize', onResize, false);
 
-        document.getElementById('WebGL-output').addEventListener('click', function() {
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
-        });
+        // document.getElementById('WebGL-output').addEventListener('click', function() {
+        //     if (video.paused) {
+        //         video.play();
+        //     } else {
+        //         video.pause();
+        //     }
+        // });
 
         document.getElementById('WebGL-output').click();
 
@@ -567,11 +567,13 @@
             }
         }
 
-        document.getElementById('WebGL-output').addEventListener( 'mousemove', onDocumentMouseMove, false );
+        // document.getElementById('WebGL-output').addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 
     }
     window.onload = init;
 </script>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus deserunt ut odit voluptatum adipisci libero amet sunt illum commodi labore non soluta beatae, dolorem, sed ad fugit alias earum doloribus nostrum perspiciatis voluptates harum laboriosam iste magnam. Amet cum quasi laudantium temporibus magni distinctio accusantium dolorum earum esse beatae sint velit cupiditate omnis aperiam inventore, eum impedit dolor pariatur. Dolorem quod esse assumenda aperiam nam blanditiis quia tempora commodi animi voluptatibus eligendi asperiores dolore beatae, consequatur? Nisi atque blanditiis officiis aspernatur et, adipisci aperiam maxime quos accusantium, iste cumque earum, animi, nam perspiciatis eveniet. Iusto porro deleniti veritatis, hic ex modi vel quod numquam at animi qui nihil sit dolor a aliquam possimus, culpa debitis sint vero quae quam! Sequi esse ratione rem cumque, ad hic suscipit nam modi consequuntur dolore nulla a debitis iusto laborum vel beatae quam delectus ut expedita sed doloribus, at animi cupiditate. Accusantium debitis, temporibus aut sunt quaerat ad, rerum provident, illum officiis repellendus atque vero iusto perspiciatis ratione. Error magni perspiciatis accusamus vitae expedita soluta repellat, nostrum eos velit quos consequuntur quae iusto maxime earum quisquam nesciunt enim sint doloremque reiciendis sequi dicta quaerat. Voluptas ipsam assumenda accusantium consequuntur at illum doloremque perspiciatis, nam itaque id voluptates nihil nobis quia alias sapiente culpa architecto quisquam dolores atque eum tempore aliquam non eaque eos. Dolores ut a perspiciatis vel qui, recusandae. Eveniet excepturi dolor ut explicabo provident architecto ullam reprehenderit, praesentium, unde incidunt quibusdam minus, sit enim aliquid neque, perferendis perspiciatis sequi amet. Placeat tempore optio voluptas id, sapiente vitae quis facilis quibusdam fugiat cupiditate laudantium voluptates voluptatum provident nihil delectus et fugit officia quia alias possimus! Aliquid optio illo expedita voluptatem facere similique magni temporibus minus voluptate quos! Architecto alias possimus, aliquam dolor sit vitae deserunt nulla excepturi porro eos, voluptatibus molestiae perspiciatis quis optio! Architecto impedit velit labore, natus sequi ratione qui, minima saepe harum ipsa in accusantium aperiam! Dignissimos deserunt, ex animi nulla tenetur hic repudiandae facilis ea est repellat nemo saepe possimus tempore, unde, dolorum officiis sequi quisquam labore. Nulla vero ab cum quaerat culpa tempora repellat possimus perspiciatis doloribus ipsa deserunt incidunt excepturi veniam est accusamus doloremque quae dolores aliquid quidem saepe facilis, harum quisquam. Veritatis, id! Veritatis minima nostrum quaerat repudiandae aspernatur quis est deserunt ullam ducimus quod tempore at, recusandae esse autem quasi perspiciatis suscipit. Magnam libero, beatae facere perferendis deleniti consectetur ex consequatur nobis doloribus vel. Porro pariatur ullam ipsa provident cumque deleniti dolorem ut hic, corrupti a sed, quae quia, officia obcaecati ad iste! Sequi dolor nobis, pariatur delectus! Blanditiis excepturi beatae, repellendus non reiciendis, mollitia consectetur veritatis quisquam eum maxime omnis in porro nostrum aperiam iste molestias magni quam voluptatum atque enim. Aperiam culpa aut consequuntur illo, necessitatibus, tempore similique ratione obcaecati earum nisi. Mollitia, vero! Amet excepturi, quibusdam harum enim sapiente quisquam tenetur, quae, eligendi iste dolore ipsa ex fugit, expedita totam ab porro odio placeat. Voluptatibus odit reiciendis ipsam. Libero quis nemo ut ipsa facilis rerum. Cumque repellendus quibusdam molestiae corporis quis eaque quos quo eveniet mollitia quisquam reiciendis aspernatur minima vel possimus illum inventore tempora nam magni, commodi, non, incidunt. Asperiores eos vero, nostrum eveniet beatae quidem, quasi tempora reprehenderit tempore, tenetur eligendi aspernatur quis ab quas at libero sit. Quam sapiente, possimus, dolor laborum est aliquid doloremque vero, libero voluptatibus culpa sed illo vel fuga ipsa eos atque aperiam. Totam tempore esse repellendus ab distinctio quisquam omnis nulla autem in vero eaque, hic facilis beatae non voluptas, tempora quo nisi, voluptatem! Cupiditate quo porro modi at qui, blanditiis laborum, dicta nisi ab minima aliquam, facilis quisquam, non atque minus in ad consequatur quae voluptates tenetur! Exercitationem ad doloremque dolorem quam iure facilis quia officia reprehenderit quos porro repellendus possimus eos quaerat, quod dignissimos ullam velit voluptates! Perferendis assumenda tenetur non debitis officiis soluta error laboriosam animi facilis possimus delectus accusamus nisi, harum fuga a fugiat sit necessitatibus quisquam dicta consectetur porro. Sapiente, unde totam a soluta, cupiditate commodi aut nam vero iste officia rem recusandae. Quo saepe fugit aspernatur quae, debitis, eos enim, cupiditate cumque recusandae inventore porro velit qui! Quod repudiandae eaque, asperiores? Nihil veniam, delectus dolores, blanditiis quas perferendis ipsam dolor facilis nisi, magnam harum quibusdam eos distinctio praesentium soluta ex molestias odio optio id commodi voluptatum porro, consequatur nemo officia quam. Deleniti, eaque minus? Consequuntur saepe nemo corporis. Omnis, magnam saepe quae deleniti maiores laboriosam accusantium provident harum doloribus tenetur. Repellat aspernatur, vitae commodi saepe id sunt debitis laboriosam quibusdam enim. Nam in temporibus eaque quas quae totam quo quisquam deleniti fuga iure dignissimos dolor, blanditiis, aliquid officia facilis ullam illum, consectetur ab dolorem et molestias! Voluptas recusandae minima fugit nihil obcaecati cupiditate error molestias, dolorum placeat, deserunt praesentium magnam saepe, architecto aliquam. Est adipisci omnis at eos, optio explicabo in dolorem quaerat delectus ullam ipsam distinctio voluptatibus sint voluptas esse sit ipsa a. Cum rerum reiciendis ut odit harum quidem maiores natus nesciunt. Nesciunt pariatur rem quasi quidem veniam veritatis, alias iusto, ab libero eaque neque odit distinctio totam delectus illum saepe, officia earum mollitia. Tempore, dignissimos, illum. Distinctio placeat corrupti consequuntur perferendis temporibus pariatur ipsum, animi esse illum numquam ab magni alias expedita quia quibusdam impedit doloribus, enim blanditiis autem laboriosam! Distinctio earum molestias atque officiis dolore laboriosam vitae nesciunt unde laborum cumque ratione aliquam ea accusamus, incidunt eveniet at eos cupiditate nostrum excepturi quia commodi autem ullam. Quaerat enim magnam et, voluptatem eius odio voluptas placeat doloribus eveniet cum. Veritatis maxime, dignissimos accusantium expedita sint voluptate ipsum autem, voluptas reiciendis molestiae quae. Doloremque maiores minus praesentium molestiae, eius aspernatur perferendis quia. Doloribus ullam, tempore perspiciatis modi cumque consequuntur quaerat sit quidem? Deleniti laborum iusto repellat sit dolorum provident corrupti quae eum aliquid voluptates natus inventore modi at accusantium ipsum, neque dolor, eos architecto. Fuga ea iste, placeat doloribus rerum dicta nisi commodi perferendis sint sit molestias officiis voluptatem vero quaerat ad quibusdam animi repellat et rem quod! Itaque suscipit ipsum nisi ex, facere accusamus ratione fugiat numquam illum minus at, deleniti. Officiis tenetur ipsa provident.</p>
 </body>
 </html>
