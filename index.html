@@ -167,8 +167,8 @@
         effectGray.uniforms['color'].value.setRGB(0.5, 0.5, 0.5);
 
         var effectDeepGray = new THREE.ShaderPass(THREE.ColorifyShader);
-        // effectDeepGray.uniforms['color'].value.setRGB(0.2, 0.2, 0.2);
-        effectDeepGray.uniforms['color'].value.setRGB(1, 0.2, 0.2);
+        effectDeepGray.uniforms['color'].value.setRGB(0.2, 0.2, 0.2);
+        // effectDeepGray.uniforms['color'].value.setRGB(1, 0.2, 0.2);
 
         var effectColorify = new THREE.ShaderPass(THREE.ColorifyShader);
         effectColorify.uniforms['color'].value.setRGB(0.5, 0.5, 1);
@@ -188,7 +188,6 @@
         composer.addPass(renderPass3); //deepGray
         composer.addPass(renderPass); //color
         composer.addPass(renderPass2); //gray
-
 
         composer.addPass(grayMask);
         // composer.addPass(effectColorify);
@@ -265,12 +264,7 @@
                 // mesh.position.y =  ( j - ygrid/2 ) * ysize - ysize;
                 mesh.position.z = 0;
 
-                // if ( Math.floor(Math.random() * 2) == 1 ) {
-                if (i < 4) {
-                    sceneDeepGray.add(mesh);
-                } else {
-                    sceneGray.add(mesh);
-                }
+                (randZeroOne()) ? sceneGray.add(mesh) : sceneDeepGray.add(mesh);
 
                 sprites.push(mesh);
                 mesh.myid = sprite_count;
@@ -568,7 +562,8 @@
                 sprite = randSprites[i];
                 sprite.material = randSpriteMaterial;
                 sprite.parent.remove(sprite);
-                sceneGray.add(sprite);
+
+                (randZeroOne()) ? sceneGray.add(sprite) : sceneDeepGray.add(sprite);
             }
         }
 
