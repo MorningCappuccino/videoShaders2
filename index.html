@@ -289,11 +289,11 @@
             var delta = clock.getDelta();
 
             // render using requestAnimationFrame
-            // requestAnimationFrame(render);
+            requestAnimationFrame(render);
             // webGLRenderer.render(scene, camera);
             composer.render(delta);
         }
-        setInterval(render, 1000/25);
+        // setInterval(render, 1000/25);
 
         function onResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
