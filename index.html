@@ -7,13 +7,11 @@
 
     <script type="text/javascript" src="js/stats.js"></script>
     <script type="text/javascript" src="js/dat.gui.js"></script>
-    <script type="text/javascript" src="js/OrbitControls.js"></script>
     <script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
     <script type="text/javascript" src="js/shaders/CopyShader.js"></script>
     <script type="text/javascript" src="js/shaders/ColorifyShader.js"></script>
 
     <script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-    <script type="text/javascript" src="js/shaders/ConvolutionShader.js"></script>
 
 
     <script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
@@ -26,6 +24,8 @@
     <script type="text/javascript" src="js/postprocessing/SavePass.js"></script>
     <script type="text/javascript" src="js/postprocessing/TexturePass.js"></script>
 
+    <script type="text/javascript" src="js/renderers/Projector.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -35,20 +35,18 @@
 </head>
 <body>
 
-<div id="Stats-output">
-</div>
 <div id="WebGL-output">
 </div>
 
 <video id="video" autoplay loop webkit-playsinline style="display:none">
     <source src="videos/video_prw_01.mp4" type='video/mp4'>
-    <!-- <source src="videos/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'> -->
 </video>
 
 <script>
+
     function init() {
 
-        var mesh;
+        var mesh, sprites = [];
 
         var sprite_count,
 
@@ -58,17 +56,14 @@
             xgrid = 8,
             ygrid = 5;
 
-        var face1 = [new THREE.Vector2(0, .5), new THREE.Vector2(.3333, .5),
-                     new THREE.Vector2(.3333, 1), new THREE.Vector2(0, 1)];
-
-        var stats = initStats();
-
         var sceneColor = new THREE.Scene();
+            sceneColor.name = 'color';
         var sceneGray = new THREE.Scene();
-        var sceneBG = new THREE.Scene();
+            sceneGray.name = 'gray';
+        var sceneDeepGray = new THREE.Scene();
+            sceneGray.name = 'deepGray';
 
-
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 3000);
         var cameraBG = new THREE.OrthographicCamera(-window.innerWidth, window.innerWidth, window.innerHeight, -window.innerHeight, -10000, 10000);
         cameraBG.position.z = 50;
 
@@ -90,73 +85,42 @@
 
         var parameters = { map: videoTexture, side: THREE.DoubleSide };
 
-        var videoMeterial = new THREE.MeshLambertMaterial(parameters);
+        var videoMeterial = new THREE.MeshBasicMaterial(parameters);
         //====================================================
 
-        var axisHelper = new THREE.AxisHelper(100);
-        sceneColor.add(axisHelper);
+        // var axisHelper = new THREE.AxisHelper(1080);
+        // sceneColor.add(axisHelper);
 
         var textureLoader = new THREE.TextureLoader();
-        var sphere = createEarthMesh(new THREE.SphereGeometry(10, 40, 40));
-        // console.log(new THREE.SphereGeometry(10, 40, 40));
-        sphere.position.x = -10;
-        var sphere2 = createMarshMesh(new THREE.SphereGeometry(5, 40, 40));
-        sphere2.position.x = 20;
-        // sceneColor.add(sphere);
-        // sceneGray.add(sphere2);
 
-        // var sprite =
         createSpriteMesh();
-        // sprite.position.x = 0;
-        // sprite.position.y = 0;
-        // sceneColor.add(sprite);
 
         // position and point the camera to the center of the scene
         // camera.position.x = -10;
         // camera.position.y = 15;
-        camera.position.z = 100;
+        // camera.position.z = 1300; //for width 1920
+        // camera.position.z = window.innerWidth / 1.477;
+        camera.position.z = window.innerHeight / 0.831;
 
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-        var orbitControls = new THREE.OrbitControls(camera);
-        orbitControls.autoRotate = false;
         var clock = new THREE.Clock();
 
         var ambi = new THREE.AmbientLight(0x181818, 10);
         var ambi2 = new THREE.AmbientLight(0x181818, 10);
+        var ambi3 = new THREE.AmbientLight(0x181818, 10);
         sceneColor.add(ambi);
         sceneGray.add(ambi2);
-
-        // var spotLight = new THREE.DirectionalLight(0xffffff);
-        // spotLight.position.set(550, 100, 550);
-        // spotLight.intensity = 0.6;
-        //
-        // var spotLight2 = new THREE.DirectionalLight(0xffffff);
-        // spotLight.position.set(550, 100, 550);
-        // spotLight.intensity = 0.6;
-
-        // sceneColor.add(spotLight2);
-        // sceneGray.add(spotLight);
-
-        var textureGalaxy = textureLoader.load("../assets/textures/starry-deep-outer-space-galaxy.jpg");
-        textureGalaxy.minFilter = THREE.LinearFilter;
-        var materialColor = new THREE.MeshBasicMaterial({
-            map: textureGalaxy,
-            depthTest: false
-        });
-        var bgPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), materialColor);
-        bgPlane.position.z = -100;
-        bgPlane.scale.set(window.innerWidth * 2, window.innerHeight * 2, 1);
-        sceneBG.add(bgPlane);
+        sceneDeepGray.add(ambi3);
 
         // add the output of the renderer to the html element
         document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
 
-
-        var bgPass = new THREE.RenderPass(sceneBG, cameraBG);
         var renderPass = new THREE.RenderPass(sceneColor, camera);
         renderPass.clear = false;
         var renderPass2 = new THREE.RenderPass(sceneGray, camera);
+        renderPass2.clear = false;
+        var renderPass3 = new THREE.RenderPass(sceneDeepGray, camera);
         renderPass2.clear = false;
 
         var effectCopy = new THREE.ShaderPass(THREE.CopyShader);
@@ -165,17 +129,22 @@
 
         var clearMask = new THREE.ClearMaskPass();
         // earth mask
-        var earthMask = new THREE.MaskPass(sceneColor, camera);
+        var colorMask = new THREE.MaskPass(sceneColor, camera);
 //        earthMask.inverse = true;
         // mars mask
-        var marsMask = new THREE.MaskPass(sceneGray, camera);
+        var grayMask = new THREE.MaskPass(sceneGray, camera);
 //        marsMask.inverse = true;
+        var deepGrayMask = new THREE.MaskPass(sceneDeepGray, camera);
 
         var effectSepia = new THREE.ShaderPass(THREE.SepiaShader);
         effectSepia.uniforms['amount'].value = 0.8;
 
         var effectGray = new THREE.ShaderPass(THREE.ColorifyShader);
         effectGray.uniforms['color'].value.setRGB(0.5, 0.5, 0.5);
+
+        var effectDeepGray = new THREE.ShaderPass(THREE.ColorifyShader);
+        effectDeepGray.uniforms['color'].value.setRGB(0.2, 0.2, 0.2);
+        // effectDeepGray.uniforms['color'].value.setRGB(1, 0.2, 0.2);
 
         var effectColorify = new THREE.ShaderPass(THREE.ColorifyShader);
         effectColorify.uniforms['color'].value.setRGB(0.5, 0.5, 1);
@@ -185,66 +154,33 @@
         composer.renderTarget2.stencilBuffer = true;
         // composer.renderTarget3.stencilBuffer = true;
 
-        composer.addPass(bgPass);
-        composer.addPass(renderPass);
-        composer.addPass(renderPass2);
+        // composer.addPass(bgPass);
+        //not working ---->>> why???
+        // composer.addPass(renderPass); //color
+        // composer.addPass(renderPass2); //gray
+        // composer.addPass(renderPass3); //deepGray
 
-        composer.addPass(marsMask);
+        //working
+        composer.addPass(renderPass3); //deepGray
+        composer.addPass(renderPass); //color
+        composer.addPass(renderPass2); //gray
+
+        composer.addPass(grayMask);
         // composer.addPass(effectColorify);
-        composer.addPass(effectSepia);
+        composer.addPass(effectGray);
         composer.addPass(clearMask);
 
-        composer.addPass(earthMask);
-        composer.addPass(effectGray);
+        // composer.addPass(colorMask);
+        // composer.addPass(effectSepia);
+        // composer.addPass(clearMask);
+
+        composer.addPass(deepGrayMask);
+        composer.addPass(effectDeepGray);
         composer.addPass(clearMask);
 
         composer.addPass(effectCopy);
 
         render();
-
-        function createMarshMesh(geom) {
-            var planetTexture = textureLoader.load("../assets/textures/planets/Mars_2k-050104.png");
-            var normalTexture = textureLoader.load("../assets/textures/planets/Mars-normalmap_2k.png");
-
-            var planetMaterial = new THREE.MeshPhongMaterial();
-            planetMaterial.normalMap = normalTexture;
-            planetMaterial.map = planetTexture;
-//               planetMaterial.shininess = 150;
-
-
-            // create a multimaterial
-            var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [planetMaterial]);
-
-            return mesh;
-        }
-
-        function createEarthMesh(geom) {
-            var planetTexture = textureLoader.load("../assets/textures/planets/Earth.png");
-            var specularTexture = textureLoader.load("../assets/textures/planets/EarthSpec.png");
-            var normalTexture = textureLoader.load("../assets/textures/planets/EarthNormal.png");
-
-
-            var planetMaterial = new THREE.MeshPhongMaterial();
-            planetMaterial.specularMap = specularTexture;
-            planetMaterial.specular = new THREE.Color(0x4444aa);
-
-
-            planetMaterial.normalMap = normalTexture;
-            planetMaterial.map = planetTexture;
-//               planetMaterial.shininess = 150;
-
-
-            // create a multimaterial
-            // var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [planetMaterial]);
-
-            //=
-
-
-            var mesh = new THREE.Mesh(geom, videoMeterial);
-            //=
-
-            return mesh;
-        }
 
         function createSpriteMesh() {
 
@@ -253,100 +189,76 @@
                 xsize, ysize;
 
             ux = 1 / xgrid; // 1/8
-            uy = 1 / ygrid; // 1/5
+            uy = 1 / ygrid; // 1/6
 
-            xsize = 177 / xgrid; //22,125
-            ysize = 100 / ygrid; //20
+            xsize = window.innerWidth / xgrid; //240
+            ysize = window.innerHeight / ygrid; //180
+
 
             var spriteShape = new THREE.Shape();
-            // spriteShape.moveTo(0, 10);
-            // spriteShape.lineTo(0, 20);
-            // spriteShape.lineTo(10, 10);
-            // spriteShape.lineTo(10, 0);
 
             sprite_count = 0;
+            var c = 0;
 
             for ( i = 0; i < xgrid; i ++ )
-            for ( j = 0; j < ygrid; j ++ ) {
+            for ( j = 0; j <= ygrid; j ++ ) {
 
                 ox = i; //offetx
-                oy = j; //offsety
+                oy = j-1; //offsety
 
                 var x = 0, y = 0;
                 var spriteShape = new THREE.Shape();
 
-                spriteShape.moveTo(0, 0);
-                spriteShape.lineTo(xsize, ysize);
-                spriteShape.lineTo(xsize, ysize * 2);
-                spriteShape.lineTo(0, ysize);
+                if (i % 2 == 0) {
+
+                    spriteShape.moveTo(0, ysize * 2);
+                    spriteShape.lineTo(0, ysize);
+                    spriteShape.lineTo(xsize, 0);
+                    spriteShape.lineTo(xsize, ysize);
+
+                } else {
+
+                    spriteShape.moveTo(0, 0);
+                    spriteShape.lineTo(xsize, ysize);
+                    spriteShape.lineTo(xsize, ysize * 2);
+                    spriteShape.lineTo(0, ysize);
+
+                }
 
                 spriteGeometry = new THREE.ShapeGeometry(spriteShape);
 
-                // spriteGeometry.faceVertexUvs[0] = [
-                //     [
-                //         face1[0], face1[1], face1[3]
-                //     ],
-                //     [
-                //         face1[1], face1[2], face1[3]
-                //     ]
-                // ];
-                for (var i2 = 0; i2 < 2; i2++)
-                for (var j2 = 0; j2 < 3; j2++) {
-                    spriteGeometry.faceVertexUvs[0][i2][j2].x /= 19;
-                    spriteGeometry.faceVertexUvs[0][i2][j2].y /= 19;
-                }
-                // spriteGeometry.faceVertexUvs[0][0][0].x /= 100;
-                // spriteGeometry.faceVertexUvs[0][0][0].y /= 100;
-                // spriteGeometry.faceVertexUvs[0][0][1].x /= 100;
-                // spriteGeometry.faceVertexUvs[0][0][1].y /= 100;
-                // spriteGeometry.faceVertexUvs[0][0][2].x /= 100;
-                // spriteGeometry.faceVertexUvs[0][0][2].y /= 100;
-                // spriteGeometry.faceVertexUvs[0][0][0].x /= 100;
-
+                minimizeFaceVertexUvs(spriteGeometry);
 
                 change_uvs( spriteGeometry, ux, uy, ox, oy );
 
                 mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
 
-                mesh.position.x =   ( i - xgrid/2 ) * xsize;
-                mesh.position.y =   ( j - ygrid/2 ) * ysize;
+                mesh.position.x =  ( i - xgrid/2 ) * xsize;
+                mesh.position.y =  ( j-1 - ygrid/2 ) * ysize;
+                // mesh.position.y =  ( j - ygrid/2 ) * ysize - ysize;
                 mesh.position.z = 0;
 
-                if ( Math.floor(Math.random() * 2) == 1 ) {
-                // if (i < 4) {
-                    sceneColor.add(mesh);
-                } else {
-                    sceneGray.add(mesh);
-                }
+                (randZeroOne()) ? sceneGray.add(mesh) : sceneDeepGray.add(mesh);
+
+                sprites.push(mesh);
+                mesh.myid = sprite_count;
 
                 sprite_count += 1;
                 // console.log(spriteGeometry);
             }
 
-            // console.log(sprite_count);
-
-
-            // var material = new THREE.MeshBasicMaterial({color: 0xff0000});
-            // var face1 = [new THREE.Vector2(0, .5), new THREE.Vector2(.3333, .5),
-            //              new THREE.Vector2(.3333, 1), new THREE.Vector2(0, 1)];
-            // spriteGeometry.faceVertexUvs[0] = [
-            //     [
-            //         face1[0], face1[1], face1[3]
-            //     ],
-            //     [
-            //         face1[1], face1[2], face1[3]
-            //     ]
-            // ];
-
-            // console.log(spriteGeometry);
-
-            // var mesh = new THREE.Mesh(spriteGeometry, videoMeterial);
-
-            return mesh;
         }
 
-        console.log(sceneColor);
-        console.log(sceneGray);
+        function minimizeFaceVertexUvs(spriteGeometry) {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            for (var i2 = 0; i2 < 2; i2++)
+            for (var j2 = 0; j2 < 3; j2++) {
+                spriteGeometry.faceVertexUvs[0][i2][j2].x /= w / 8.1;
+                spriteGeometry.faceVertexUvs[0][i2][j2].y /= h / 5.1;
+            }
+        }
 
         function change_uvs( geometry, unitx, unity, offsetx, offsety ) {
 
@@ -373,52 +285,225 @@
 
             webGLRenderer.autoClear = false;
 
-            stats.update();
-
-
             //sphere.rotation.y=step+=0.01;
             var delta = clock.getDelta();
-            orbitControls.update(delta);
-
-            sphere.rotation.y += 0.002;
-            sphere2.rotation.y += 0.002;
 
             // render using requestAnimationFrame
             requestAnimationFrame(render);
-//            webGLRenderer.render(scene, camera);
+            // webGLRenderer.render(scene, camera);
             composer.render(delta);
         }
-
-        function initStats() {
-
-            var stats = new Stats();
-            stats.setMode(0); // 0: fps, 1: ms
-
-            // Align top-left
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-
-            document.getElementById("Stats-output").appendChild(stats.domElement);
-
-            return stats;
-        }
+        // setInterval(render, 1000/25);
 
         function onResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+            // createSpriteMesh();
+            // console.log(sceneGray);
         }
 
         window.addEventListener('resize', onResize, false);
 
-        document.getElementById('WebGL-output').addEventListener('click', function() {
-            if (video.paused) {
-                video.play();
+        document.getElementById('WebGL-output').click();
+
+        /*-----------------------------------------------------
+        -----------------RayCast on mousemove------------------
+        ------------------------------------------------------*/
+
+        var raycaster = new THREE.Raycaster(),
+			mouse = new THREE.Vector2();
+        var currHightlightSprite, prevHightlightSprite, isFirst = true,
+            currTexture, prevTexture;
+        var currSibling, prevSibling;
+
+        function onDocumentMouseMove( event ) {
+
+            // console.log(event);
+
+            event.preventDefault();
+
+            mouse.x = ( event.clientX / webGLRenderer.domElement.clientWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / webGLRenderer.domElement.clientHeight ) * 2 + 1;
+
+			raycaster.setFromCamera( mouse, camera );
+
+            var intersects = raycaster.intersectObjects( sprites );
+            // console.log(intersects);
+
+            if ( intersects.length > 0 ) {
+
+                    var obj = intersects[ 0 ].object;
+
+                    saveCurrPrevSprite(obj);
+
+                    var currScene = obj.parent;
+                    if (currScene != 'color') {
+                        if (prevHightlightSprite) {
+                            sceneColor.remove(prevHightlightSprite);
+                            // prevHightlightSprite.material = currTexture;
+                            sceneGray.add(prevHightlightSprite);
+
+                            prevSibling.forEach(function(sprite, index) {
+    					        sceneColor.remove(sprite);
+    					        sceneGray.add(sprite);
+                                //check for prevSprite != currColorSprite
+                                randSprites.forEach(function(colorSprite, i) {
+                                    if (colorSprite == sprite) {
+    					                sceneGray.remove(sprite);
+    					                sceneColor.add(sprite);
+                                    }
+                                });
+                            });
+                        }
+
+					    currScene.remove(currHightlightSprite);
+					    sceneColor.add(currHightlightSprite);
+
+                        currSibling.forEach(function(sprite, index) {
+					        currScene.remove(sprite);
+					        sceneColor.add(sprite);
+                        });
+
+                    }
+
+			}
+
+        }
+
+        function saveCurrPrevSprite(obj) {
+            if (!isFirst) {
+                if (obj != currHightlightSprite) {
+                    // console.log('new sprite');
+                    prevHightlightSprite = currHightlightSprite;
+                    // prevTexture = currHightlightSprite.material;
+                    currHightlightSprite = obj;
+                    // currTexture = obj.material;
+
+                    //save prevSibling
+                    prevSibling = currSibling;
+                    currSibling = getSiblingSprite(obj);
+
+                    //unfill prev Random Sprite
+                    unfillSprite();
+                    //fill Random Sprites
+                    fillSprites();
+                }
             } else {
-                video.pause();
+                currHightlightSprite = obj;
+                // currTexture = obj.material;
+
+                //save currSibling
+                currSibling = getSiblingSprite(obj);
+
+                //fill Random Sprites
+                fillSprites();
+
+                isFirst = false;
             }
-        });
+        }
+
+        function getSiblingSprite(obj) {
+            var currIndex, siblingIndex = [], siblingMesh = [];
+
+            sprites.forEach(function(sprite, index) {
+                if (sprite.uuid == obj.uuid) {
+                    currIndex = index;
+                }
+            });
+
+            siblingIndex.push(currIndex - 1);
+            siblingIndex.push(currIndex + 1);
+
+            if (randZeroOne()) siblingIndex.push(currIndex + 5);
+            if (randZeroOne()) siblingIndex.push(currIndex - 5);
+            if (randZeroOne()) siblingIndex.push(currIndex + 6);
+            if (randZeroOne()) siblingIndex.push(currIndex - 6);
+            if (randZeroOne()) siblingIndex.push(currIndex + 7);
+            if (randZeroOne()) siblingIndex.push(currIndex - 7);
+
+
+            sprites.forEach(function(sprite, index) {
+                siblingIndex.forEach(function(si, i) {
+                    if (index == si) {
+                        siblingMesh.push(sprite);
+                    }
+                });
+            });
+
+            return siblingMesh;
+        }
+
+        function randZeroOne() {
+            return Math.floor(Math.random() * 2);
+        }
+
+        function randSprite() {
+            var rand = Math.floor(Math.random() * sprites.length);
+            return sprites[rand];
+        }
+
+        var randSprites = [];
+        var randSpriteMaterial;
+        var disableWhiteSprite = [14, 15, 16, 20, 21, 22, 26, 27, 28, 32, 33, 34];
+        var enableWhiteSprite = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18,
+                                22, 23, 24,  28, 29, 30, 34, 35, 36, 37, 38, 39, 40,
+                                41, 42, 43, 44, 45, 46, 47];
+
+        function fillSprites() {
+            var randSpr;
+            var sprite, scene;
+            var colors = [0xdd0934, 0x2c2664, 0xffffff];
+            randSpriteMaterial = sprites[0].material;
+            for (var i = 0; i < 3; i++) {
+                randSpr = randSprite();
+                sprite = (randSpr != currHightlightSprite) ? randSpr : randSprite();
+
+                if (i != 2) {
+                    randSprites[i] = sprite;
+                    sprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                } else {
+                    //white color
+                    var newSprite;
+                    for (var j = 0; j < disableWhiteSprite.length; j++) {
+                        if (sprite.myid == disableWhiteSprite[j]) {
+                            var rand = Math.floor(Math.random() * enableWhiteSprite.length);
+                            newSprite = sprites[enableWhiteSprite[rand]];
+                            break;
+                        }
+                    }
+                    if (newSprite) {
+                        randSprites[i] = sprite = newSprite;
+                        newSprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                    } else {
+                        randSprites[i] = sprite;
+                        sprite.material = new THREE.MeshBasicMaterial({ color: colors[i] });
+                    }
+                }
+
+                scene = sprite.parent;
+                //to sceneColor
+                if (scene != 'color') {
+                    scene.remove(sprite);
+                    sceneColor.add(sprite);
+                }
+            }
+
+        }
+
+        function unfillSprite() {
+            var sprite;
+            for (var i = 0; i < 3; i++) {
+                sprite = randSprites[i];
+                sprite.material = randSpriteMaterial;
+                sprite.parent.remove(sprite);
+
+                (randZeroOne()) ? sceneGray.add(sprite) : sceneDeepGray.add(sprite);
+            }
+        }
+
+        document.getElementById('WebGL-output').addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 
     }
     window.onload = init;
